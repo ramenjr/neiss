@@ -2,3 +2,4 @@
 *.tsv
 .ipynb_checkpoints/
 dev.ipynb
+.idea/
