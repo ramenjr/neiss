@@ -1,29 +1,44 @@
+"""
+This module contains utility functions for downloading and preprocessing NEISS data.
+"""
+
 import csv
 import os
-from pathlib import Path
+
 import wget
 
-from dotenv import find_dotenv, load_dotenv
 
-find_dotenv()
-load_dotenv()
+def download_raw_data(target_dir):
+    """
+    Downloads NEISS data, in tsv format, from the Consumer Product Safety Commission's
+    website to the provided target directory, `target_dir`.
 
-RAW_DATA_DIR = Path(os.environ["RAW_DATA_DIRECTORY"])
-INTERIM_DATA_DIR = Path(os.environ["INTERIM_DATA_DIRECTORY"])
+    The data is separated into one file per year, starting from 1999.
 
-def download_raw_data():
+    :param target_dir: str, Pathlike
+    :return: None
+    """
     urls = ["https://www.cpsc.gov/cgibin/NEISSQuery/Data/Archived%20Data/{0}/neiss{0}.tsv".format(year)
-            for year in range(1999,2018)]
+            for year in range(1999, 2018)]
 
     for url in urls:
-        wget.download(url,out = str(RAW_DATA_DIR / url.split("/")[-1]))
+        filename = url.split("/")[-1]
+        wget.download(url, out=os.path.abspath(os.path.join(target_dir, filename)))
 
 
+def combine_raw_data(raw_dir, target_dir):
+    """
+    Combines the raw NEISS tsv files into a single TSV file.
 
-def consolidate_raw_data():
-    files = [file for file in RAW_DATA_DIR.iterdir() if file.suffix == ".tsv"]
+    :param raw_dir: str, Pathlike
+    :param target_dir: str, Pathlike
+    :return: None
+    """
+    files = [os.path.abspath(os.path.join(raw_dir, file)) for file in os.listdir(raw_dir) if file.endswith(".tsv")]
 
-    with open(INTERIM_DATA_DIR / "neiss.tsv", "xt") as target:
+    target_file = os.path.abspath(os.path.join(target_dir, "neiss.tsv"))
+
+    with open(target_file, "xt") as target:
         # Writes header to file. The schema for each NEISS tsv file is
         # consistent fon a year to year basis.
         with open(files[0]) as header_file:
