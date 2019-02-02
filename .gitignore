@@ -3,3 +3,4 @@
 .ipynb_checkpoints/
 dev.ipynb
 .idea/
+*/__pycache__
