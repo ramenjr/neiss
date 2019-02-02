@@ -21,6 +21,7 @@ def consolidate_tsv(data_directory):
         # Writes contents to the tsv file.
         for file in files:
             with open(file) as part:
+                print("Now writing {} to neiss.tsv.".format(file.name))
                 reader = csv.DictReader(part, delimiter="\t")
                 writer = csv.DictWriter(target, fieldnames=reader.fieldnames,delimiter="\t")
                 reader.__next__()
