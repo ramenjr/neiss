@@ -1,12 +1,11 @@
 """
-This module contains utility functions for downloading and preprocessing NEISS data.
+This module contains functions for downloading and preprocessing NEISS data.
 """
 
 import csv
 import os
 
 import wget
-
 
 def download_raw_data(target_dir):
     """
