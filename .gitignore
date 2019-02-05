@@ -4,3 +4,4 @@
 dev.ipynb
 .idea/
 */__pycache__
+neiss/scratch.py
