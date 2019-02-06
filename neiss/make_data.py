@@ -25,32 +25,28 @@ def download_raw_data(target_dir):
         wget.download(url, out=os.path.abspath(os.path.join(target_dir, filename)))
 
 
-def combine_raw_data(raw_dir, target_dir):
+def _get_header(file):
+    with open(file) as f:
+        header = next(f)
+        return "".join([field.strip('"') for field in header])
+
+
+def combine_raw_data(raw_dir, target):
     """
     Combines the raw NEISS tsv files into a single TSV file.
 
     :param raw_dir: str, Pathlike
-    :param target_dir: str, Pathlike
+    :param target: str, Pathlike
     :return: None
     """
-    files = [os.path.abspath(os.path.join(raw_dir, file)) for file in os.listdir(raw_dir) if file.endswith(".tsv")]
+    infiles = [os.path.join(raw_dir, file) for file in os.listdir(raw_dir) if file.endswith(".tsv")]
+    with open(target, "xt", encoding="utf-8") as outfile:
+        outfile.write(_get_header(infiles[0]))
 
-    target_file = os.path.abspath(os.path.join(target_dir, "neiss.tsv"))
-
-    with open(target_file, "xt") as target:
-        # Writes header to file. The schema for each NEISS tsv file is
-        # consistent fon a year to year basis.
-        with open(files[0]) as header_file:
-            reader = csv.DictReader(header_file, delimiter="\t")
-            writer = csv.DictWriter(target, fieldnames=reader.fieldnames, delimiter="\t")
-            writer.writeheader()
-
-        # Writes contents to the tsv file.
-        for file in files:
-            with open(file) as part:
-                print("Now writing {} to neiss.tsv.".format(file.name))
-                reader = csv.DictReader(part, delimiter="\t")
-                writer = csv.DictWriter(target, fieldnames=reader.fieldnames, delimiter="\t")
-                reader.__next__()
-                for row in reader:
-                    writer.writerow(row)
+        for file in infiles:
+            with open(file) as infile:
+                print("Now writing {} to target.".format(os.path.basename(file)))
+                next(infile)
+                for line in infile:
+                    if line.count("\t") == 18:
+                        outfile.write(line)
