@@ -1,7 +1,9 @@
 *.env
 *.tsv
+*.xlsx
 .ipynb_checkpoints/
 dev.ipynb
+Untitled*.ipynb
 .idea/
 */__pycache__
 neiss/scratch.py

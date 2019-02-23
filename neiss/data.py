@@ -2,12 +2,12 @@
 This module contains functions for downloading and preprocessing NEISS data.
 """
 
-import csv
 import os
 
 import wget
 
-def download_raw_data(target_dir):
+
+def download(target_dir, ext="xlsx"):
     """
     Downloads NEISS data, in tsv format, from the Consumer Product Safety Commission's
     website to the provided target directory, `target_dir`.
@@ -15,9 +15,11 @@ def download_raw_data(target_dir):
     The data is separated into one file per year, starting from 1999.
 
     :param target_dir: str, Pathlike
+           ext: str
     :return: None
     """
-    urls = ["https://www.cpsc.gov/cgibin/NEISSQuery/Data/Archived%20Data/{0}/neiss{0}.tsv".format(year)
+
+    urls = ["https://www.cpsc.gov/cgibin/NEISSQuery/Data/Archived%20Data/{0}/neiss{0}.{1}".format(year, ext)
             for year in range(1999, 2018)]
 
     for url in urls:
@@ -31,7 +33,7 @@ def _get_header(file):
         return "".join([field.strip('"') for field in header])
 
 
-def combine_raw_data(raw_dir, target):
+def combine_raw_tsv(raw_dir, target):
     """
     Combines the raw NEISS tsv files into a single TSV file.
 
@@ -48,5 +50,6 @@ def combine_raw_data(raw_dir, target):
                 print("Now writing {} to target.".format(os.path.basename(file)))
                 next(infile)
                 for line in infile:
+                    # Lines without 18 tabs are malformed, and not written to file.
                     if line.count("\t") == 18:
                         outfile.write(line)

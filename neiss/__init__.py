@@ -5,5 +5,5 @@ may be used as part of a data pipeline or directly e.g. in IPython
 or a Jupyter notebook.
 """
 
-from .make_data import *
+from .data import *
 
